@@ -5,20 +5,23 @@
 // Nexus docker repository components map to a docker repository or docker image
 // Nexus docker repository components versions map to docker image tags
 */
+
+
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.Multimap
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import org.joda.time.DateTime
 import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import groovy.json.JsonSlurper
 
-class ReverseDateTimeComparator implements Comparator<DateTime> {
-    @Override
-    int compare(DateTime o1, DateTime o2) {
-        return o2.compareTo(o1)
-    }
-}
+import ReverseDateTimeComparator
+import JsonMap
+
 def request = new JsonSlurper().parseText(args)
-def result = '['
+def result = ""
 assert request.repoName: 'repoName parameter is required'
 
 def repo = repository.repositoryManager.get(request.repoName)
@@ -50,24 +53,34 @@ try {
             artifacts.put(gaString, sortedComponents)
         }
     }
-    log.info("Found {} artifacts (groupId:artifactId)", artifacts.size())
 
     Component component
+    def repositoryList = []
+
     for (String artifactString : artifacts.keySet()) {
-        log.info("Processing artifact {} in repo {}", artifactString, repo.name)
         sortedComponents = artifacts.get(artifactString)
         Iterator componentsIterator = sortedComponents.iterator()
+        def componentMap = [:]
+        def versions = [];
+        def name = ""
         while (componentsIterator.hasNext()) {
             component = componentsIterator.next().getValue()
-            log.info("Component: {}:{}", component.name(), component.version())
+            name = component.name()
+            versions.add(component.version())
         }
+        componentMap.put('name',name)
+        componentMap.put('versions',versions)
+        repositoryList << componentMap
     }
-
+    def mapper = new JsonMap()
+    def repositoryMap = ['repositories':repositoryList]
+    log.info("RepositoryMap: {}", repositoryMap)
+    result = mapper.toJSON(repositoryMap)
     storageTx.commit()
 
 }
 catch (Exception e) {
-    log.warn("Cleanup failed!!!")
+    log.warn("Listing failed!!!")
     log.warn("Exception details: {}", e.toString())
     log.warn("Rolling back storage transaction")
     storageTx.rollback()
@@ -76,6 +89,6 @@ finally {
     storageTx.close()
 }
 
-//return result
+return result
 
 

@@ -4,12 +4,8 @@ import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import groovy.json.JsonSlurper
 
-class ReverseDateTimeComparator implements Comparator<DateTime> {
-    @Override
-    int compare(DateTime o1, DateTime o2) {
-        return o2.compareTo(o1)
-    }
-}
+import ReverseDateTimeComparator
+
 def request = new JsonSlurper().parseText(args)
 assert request.repoName: 'repoName parameter is required'
 assert request.versionsToKeep: 'versionsToKeep parameter is required. Eg. versionsToKeep=10.'
