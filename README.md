@@ -90,7 +90,7 @@ or
 ```
 
 Option -d is a json file that should contain at least the docker repoName and number of versionsToKeep.
-See example [docker-repo.json].
+See example [ldap.json].
 
-[docker-repo.json]: ./docker-repo.json
+[docker-repo.json]: src/test/integration-test/docker-test.json
 [ldap.json]: src/test/integration-test/ldap.json
