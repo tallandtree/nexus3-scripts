@@ -1,0 +1,9 @@
+{
+  "host": "myadhost.company.com",
+  "port": "3268",
+  "searchBase": "DC=company,DC=com",
+  "systemUsername": "company\myuser",
+  "systemPassword": "******",
+  "userBaseDn": "OU=Users,OU=LocationX,OU=Netherlands,OU=Europe",
+  "ldapFilter": "(&(objectCategory=Person)(cn=*))"
+}

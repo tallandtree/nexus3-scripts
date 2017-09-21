@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# A simple example script that run a script in the Nexus Repository Manager
-# Script runs the 'depending' groovy script first to load the used classes.
+# A simple example script that runs a script in the Nexus Repository Manager
+# Script runs the 'required' groovy script first to load the groovy classes used
+# in the various scripts.
 
 # fail if anything errors
 set -e

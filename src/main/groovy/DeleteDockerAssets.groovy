@@ -1,3 +1,11 @@
+/*
+// This groovy script deletes docker images and tags from a Nexus docker repository
+// but preserves the latest 'versionsToKeep'
+// Note:
+// Nexus docker repository maps to a docker registry
+// Nexus docker repository components map to a docker repository or docker image
+// Nexus docker repository components versions map to docker image tags
+*/
 import org.joda.time.DateTime
 import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
