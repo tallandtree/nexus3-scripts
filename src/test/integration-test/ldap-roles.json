@@ -1,0 +1,18 @@
+[ {
+  "id": "NXRM3-CC-OC-USERS",
+  "name": "NXRM3-CC-OC-USERS",
+  "description": "Nexus 3 CC OC Uers",
+  "privileges": ["nx-repository-view-*-*-add",
+                 "nx-repository-view-*-*-browse",
+                 "nx-repository-view-*-*-delete",
+                 "nx-repository-view-*-*-edit",
+                 "nx-repository-view-*-*-read"],
+  "roles": [""]},
+  {
+  "id": "NXRM3-ADMINS",
+  "name": "NXRM3-ADMINS",
+  "description": "Administrators",
+  "privileges": [],
+  "roles": ["nx-admin"]
+  }
+]

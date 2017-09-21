@@ -79,8 +79,7 @@ See example [docker-repo.json].
 ```bash
 curl -v -X POST -u admin:****** \
     --header "Content-Type: text/plain" \
-    -d "{\"repoName\": \"test\", \"versionsToKeep\": \"5\", \"dryRun\": \"y\"}" \
-    https://repository.host.com/service/siesta/rest/v1/script/ConfigureLDAP/run
+    -d @ldap.json https://repository.host.com/service/siesta/rest/v1/script/ConfigureLDAP/run
 ```
 
 or
@@ -89,8 +88,25 @@ or
 ./run.sh -h https://repository.host -u admin -p **** -n ConfigureLDAP -d ldap.json
 ```
 
-Option -d is a json file that should contain at least the docker repoName and number of versionsToKeep.
-See example [ldap.json].
+Option -d is a json file containing the ldap configuration. See example [ldap.json].
+
+### Add LDAP Groups with permissions
+
+```bash
+curl -v -X POST -u admin:****** \
+    --header "Content-Type: text/plain" \
+    -d @ldap-roles.json https://repository.host.com/service/siesta/rest/v1/script/AddLDAPRole/run
+```
+
+or
+
+```bash
+./run.sh -h https://repository.host -u admin -p **** -n AddLDAPRole -d ldap-roles.json
+```
+
+Option -d is a json file containing the ldap roles to be created with permissions.
+See example [ldap-roles.json].
 
 [docker-repo.json]: src/test/integration-test/docker-test.json
 [ldap.json]: src/test/integration-test/ldap.json
+[ldap-roles.json]: src/test/integration-test/ldap-roles.json
