@@ -1,9 +1,29 @@
 {
-  "host": "myadhost.company.com",
-  "port": "3268",
-  "searchBase": "DC=company,DC=com",
-  "systemUsername": "company\myuser",
-  "systemPassword": "******",
-  "userBaseDn": "OU=Users,OU=LocationX,OU=Netherlands,OU=Europe",
-  "ldapFilter": "(&(objectCategory=Person)(cn=*))"
+	"name": "MYLDAPCONNECTION",
+	"connection": {
+		"host": {
+			"protocol": "ldap",
+			"hostName": "server.company.com",
+			"port": 3268
+		},
+		"maxIncidentsCount": 3,
+		"connectionRetryDelay": 300,
+		"connectionTimeout": 15,
+		"searchBase": "DC=company,DC=com",
+		"authScheme": "simple",
+		"systemUsername": "CN=username,CN=Users,DC=company,DC=com",
+                "systemPassword": "********",
+	},
+	"mapping": {
+                "userBaseDn": "OU=Users,OU=DepartmentX,OU=Netherlands,OU=Europe",
+		"userSubtree": true,
+		"userObjectClass": "user",
+		"userIdAttribute": "sAMAccountName",
+		"userPasswordAttribute": "",
+		"userRealNameAttribute": "displayName",
+		"emailAddressAttribute": "mail",
+		"ldapGroupsAsRoles": true,
+		"userMemberOfAttribute": "memberOf",
+                "ldapFilter": "(&(objectCategory=Person)(cn=*))"
+	}
 }
