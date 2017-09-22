@@ -15,10 +15,12 @@ import groovy.json.JsonSlurper
 import ReverseDateTimeComparator
 
 def request = new JsonSlurper().parseText(args)
+def result = ""
 assert request.repoName: 'repoName parameter is required'
 assert request.versionsToKeep: 'versionsToKeep parameter is required. Eg. versionsToKeep=10.'
 boolean dryRun = request.dryRun.toBoolean() ?: false
 int versionsToKeep = request.versionsToKeep.toInteger()
+def filterimage = request.image ?: ''
 
 log.info("Gathering Asset list for repository: {} with max versionsToKeep: {}, dryRun: {}",
         request.repoName, versionsToKeep, dryRun)
@@ -53,33 +55,46 @@ try {
     log.info("Found {} artifacts (groupId:artifactId)", artifacts.size())
 
     Component component
+    def imagesDeleted = []
+
     for (String artifactString : artifacts.keySet()) {
         log.info("Processing artifact {} in repo {}", artifactString, repo.name)
         sortedComponents = artifacts.get(artifactString)
         Iterator componentsIteratorReverse = sortedComponents.iterator().reverse()
         int versionsToRemove = sortedComponents.iterator().size() - versionsToKeep
         log.info("Number of components to remove: {}", versionsToRemove)
-        // just for debug: print all
-        /* Iterator componentsIterator = sortedComponents.iterator()
-        while (componentsIterator.hasNext()) {
-            component = componentsIterator.next().getValue()
-            log.info("Component: {}:{}:{}", component.group(), component.name(), component.version())
-        }*/
+
+        def componentMap = [:]
+        def versions = [];
+        def name = ""
 
         // Components are sorted by creation date, last created is printed last
         int counter=0
         while (componentsIteratorReverse.hasNext() && counter < versionsToRemove) {
             component = componentsIteratorReverse.next().getValue()
-            if (!dryRun) {
-                log.info("Deleting component: {}:{}:{}", component.group(), component.name(), component.version())
-                storageTx.deleteComponent(component)
-            } else {
-                log.info("Dry Run deleting component: {}:{}:{}", component.group(), component.name(), component.version())
+            name = component.name()
+            if (filterimage == '' || filterimage == name) {
+                versions.add(component.version())
+                if (!dryRun) {
+                    log.info("Deleting component: {}:{}:{}", component.group(), component.name(), component.version())
+                    storageTx.deleteComponent(component)
+                    componentMap.put('name',name)
+                    componentMap.put('versions',versions)
+                    imagesDeleted << componentMap
+                } else {
+                    log.info("Dry Run deleting component: {}:{}:{}", component.group(), component.name(), component.version())
+                    componentMap.put('name',name)
+                    componentMap.put('versions',versions)
+                    imagesDeleted << componentMap
+                }
             }
             counter++
         }
     }
-
+    def mapper = new JsonMap()
+    def deletedImagesMap = ['repositories':imagesDeleted]
+    log.info("RepositoryMap: {}", deletedImagesMap)
+    result = mapper.toJSON(deletedImagesMap)
     storageTx.commit()
 }
 catch (Exception e) {
@@ -92,4 +107,4 @@ finally {
     storageTx.close()
 }
 
-
+return result
