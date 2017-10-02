@@ -39,36 +39,20 @@ curl -v -X POST -u admin:****** \
     https://repository.host.com/service/siesta/rest/v1/script/JsonMap/run
 ```
 
-### List Docker assets
+### Delete or list Docker assets
 
 ```bash
 curl -v -X POST -u admin:****** \
     --header "Content-Type: text/plain" \
-    -d "{\"repoName\": \"docker-local\"}" \
-    https://repository.host.com/service/siesta/rest/v1/script/ListDockerAssets/run
-```
-
-or
-
-```bash
-./run.sh -h https://repository.host -u admin -p **** -n ListDockerAssets -d mydocker-repo.json
-```
-
-Option -d is a json file that should contain at least the docker repoName. See example [docker-repo.json].
-
-### Delete Docker assets
-
-```bash
-curl -v -X POST -u admin:****** \
-    --header "Content-Type: text/plain" \
-    -d "{\"repoName\": \"test\", \"versionsToKeep\": \"5\", \"dryRun\": \"y\"}" \
+    -d "{\"repoName\": \"test\", \"versionsToKeep\": \"5\", \"delete\": \"y\", \"imageFilter\": \"prefix/.*\"}" \
     https://repository.host.com/service/siesta/rest/v1/script/DeleteDockerAssets/run
 ```
+To only list docker assets, set the delete parameter to "n".
 
 or
 
 ```bash
-./run.sh -h https://repository.host -u admin -p **** -n ListDockerAssets -d mydocker-repo.json
+./run.sh -h https://repository.host -u admin -p **** -n DeleteDockerAssets -d mydocker-repo.json
 ```
 
 Option -d is a json file that should contain at least the docker repoName and number of versionsToKeep.

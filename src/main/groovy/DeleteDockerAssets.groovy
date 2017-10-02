@@ -1,6 +1,8 @@
 /*
 // This groovy script deletes docker images and tags from a Nexus docker repository
 // but preserves the latest 'versionsToKeep'
+// Use option "imageFilter=filter" to set a filter on docker images
+// Use option "delete=y" to delete images, else images are only listed.
 // Note:
 // Nexus docker repository maps to a docker registry
 // Nexus docker repository components map to a docker repository or docker image
@@ -8,6 +10,7 @@
 */
 import org.joda.time.DateTime
 import org.sonatype.nexus.repository.storage.Component
+import org.sonatype.nexus.repository.storage.Query
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import groovy.json.JsonSlurper
@@ -17,13 +20,13 @@ import ReverseDateTimeComparator
 def request = new JsonSlurper().parseText(args)
 def result = ""
 assert request.repoName: 'repoName parameter is required'
-assert request.versionsToKeep: 'versionsToKeep parameter is required. Eg. versionsToKeep=10.'
-boolean dryRun = request.dryRun.toBoolean() ?: false
+assert request.versionsToKeep.isInteger(): 'versionsToKeep parameter is required. Eg. versionsToKeep=10.'
+boolean deleteImages = request.delete.toBoolean() ?: false
 int versionsToKeep = request.versionsToKeep.toInteger()
-def filterimage = request.image ?: ''
+def filterImage = request.imageFilter ?: ''
 
-log.info("Gathering Asset list for repository: {} with max versionsToKeep: {}, dryRun: {}",
-        request.repoName, versionsToKeep, dryRun)
+log.info("Gathering Asset list for repository: {} with max versionsToKeep: {}, delete: {}",
+        request.repoName, versionsToKeep, deleteImages)
 
 def repo = repository.repositoryManager.get(request.repoName)
 
@@ -40,7 +43,10 @@ try {
     SortedMap<DateTime, Component> sortedComponents
     ReverseDateTimeComparator reverseComparator = new ReverseDateTimeComparator()
     String gaString
-    for (Component component : storageTx.browseComponents(storageTx.findBucket(repo))) {
+
+    Iterable<Component> components = storageTx.findComponents(Query.builder().where('name MATCHES ').param(filterImage).build(), [repo])
+    components.each { component ->
+        log.debug("Found: {} {}",component.name(),component.version())
         gaString = sprintf("%s:%s", [component.group(), component.name()])
         if (artifacts.containsKey(gaString)) {
             sortedComponents = artifacts.get(gaString)
@@ -73,20 +79,18 @@ try {
         while (componentsIteratorReverse.hasNext() && counter < versionsToRemove) {
             component = componentsIteratorReverse.next().getValue()
             name = component.name()
-            if (filterimage == '' || filterimage == name) {
-                versions.add(component.version())
-                if (!dryRun) {
+            versions.add(component.version())
+            if (deleteImages) {
                     log.info("Deleting component: {}:{}:{}", component.group(), component.name(), component.version())
                     storageTx.deleteComponent(component)
                     componentMap.put('name',name)
                     componentMap.put('versions',versions)
                     imagesDeleted << componentMap
-                } else {
+            } else {
                     log.info("Dry Run deleting component: {}:{}:{}", component.group(), component.name(), component.version())
                     componentMap.put('name',name)
                     componentMap.put('versions',versions)
                     imagesDeleted << componentMap
-                }
             }
             counter++
         }

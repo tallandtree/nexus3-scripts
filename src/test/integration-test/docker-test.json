@@ -1,6 +1,6 @@
 {
   "repoName": "test",
   "versionsToKeep": "3",
-  "image": "cm/java-oracle",
-  "dryRun": "y"
+  "imageFilter": "cm/java-oracle",
+  "delete": "y"
 }
