@@ -91,6 +91,28 @@ or
 Option -d is a json file containing the ldap roles to be created with permissions.
 See example [ldap-roles.json].
 
+## Resetting admin account
+
+https://support.sonatype.com/hc/en-us/articles/115002930827-Accessing-the-OrientDB-Console
+
+### Reset admin password
+
+Run this:
+```psql
+connect plocal:../sonatype-work/nexus3/db/security admin admin
+
+update user SET password="$shiro1$SHA-512$1024$NE+wqQq/TmjZMvfI7ENh/g==$V4yPw8T64UQ6GfJfxYq2hLsVrBY8D1v+bktfOxGdt4b/9BthpWPNUy/CBk6V9iA0nHpzYzJFWO8v/tZFtES8CA==" UPSERT WHERE id="admin"
+
+exit
+```
+### Reset admin role
+
+Run this:
+
+connect plocal:../sonatype-work/nexus3/db/security admin admin
+update user_role_mapping set roles=["nx-admin"] upsert where userId='admin' 
+exit
+
 [docker-repo.json]: src/test/integration-test/docker-test.json
 [ldap.json]: src/test/integration-test/ldap.json
 [ldap-roles.json]: src/test/integration-test/ldap-roles.json

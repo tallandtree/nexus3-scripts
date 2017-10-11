@@ -83,17 +83,14 @@ try {
             if (deleteImages) {
                     log.info("Deleting component: {}:{}:{}", component.group(), component.name(), component.version())
                     storageTx.deleteComponent(component)
-                    componentMap.put('name',name)
-                    componentMap.put('versions',versions)
-                    imagesDeleted << componentMap
             } else {
                     log.info("Dry Run deleting component: {}:{}:{}", component.group(), component.name(), component.version())
-                    componentMap.put('name',name)
-                    componentMap.put('versions',versions)
-                    imagesDeleted << componentMap
             }
+            componentMap.put('name',name)
+            componentMap.put('versions',versions)
             counter++
         }
+        imagesDeleted << componentMap
     }
     def mapper = new JsonMap()
     def deletedImagesMap = ['repositories':imagesDeleted]

@@ -1,6 +1,6 @@
 {
   "repoName": "test",
-  "versionsToKeep": "3",
-  "imageFilter": "cm/java-.*",
-  "delete": "y"
+  "versionsToKeep": "0",
+  "imageFilter": "cm/.*",
+  "delete": "n"
 }

@@ -14,5 +14,16 @@
   "description": "Administrators",
   "privileges": [],
   "roles": ["nx-admin"]
+  },
+  {
+  "id": "NXRM3-CC-H-USERS",
+  "name": "NXRM3-CC-H-USERS",
+  "description": "Nexus 3 CC H users",
+  "privileges": ["nx-repository-view-*-*-add",
+                 "nx-repository-view-*-*-browse",
+                 "nx-repository-view-*-*-delete",
+                 "nx-repository-view-*-*-edit",
+                 "nx-repository-view-*-*-read"],
+  "roles": [""]
   }
 ]
